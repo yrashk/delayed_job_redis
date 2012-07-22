@@ -198,11 +198,11 @@ module Delayed
               end
 
               Delayed::Worker.redis.watch *keys
-              Delayed::Worker.redis.multi
+              Delayed::Worker.redis.multi do
 
-              keys.each {|key| Delayed::Worker.redis.hmset key, "locked_at", now, "locked_by", worker}
+                keys.each {|key| Delayed::Worker.redis.hmset key, "locked_at", now, "locked_by", worker}
 
-              Delayed::Worker.redis.exec
+              end
               
               keys.length
             else
@@ -217,11 +217,10 @@ module Delayed
               end
 
               Delayed::Worker.redis.watch *keys
-              Delayed::Worker.redis.multi
+              Delayed::Worker.redis.multi do
               
-              keys.each {|key| Delayed::Worker.redis.hset key, "locked_at", now }
-              
-              Delayed::Worker.redis.exec
+                keys.each {|key| Delayed::Worker.redis.hset key, "locked_at", now }
+              end
               
               keys.length
             end
